@@ -1,0 +1,349 @@
+.agendar-demo-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+/* Stepper */
+.stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.step.active {
+  color: #023E8A;
+  font-weight: 600;
+}
+
+.step-circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: white;
+}
+
+.step.active .step-circle {
+  border-color: #023E8A;
+  background: #023E8A; /* O un icono de check si está completado */
+}
+
+.step.completed .step-circle {
+  background: #023E8A;
+  border-color: #023E8A;
+}
+
+.step-line {
+  width: 100px;
+  height: 2px;
+  background: #e0e0e0;
+  margin: 0 10px;
+}
+
+.step-line.active {
+  background: #023E8A;
+}
+
+/* Logos */
+.logos-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 2px;
+  border-radius: 100px;
+}
+
+.logo-img {
+  height: 60px;
+  object-fit: contain;
+}
+
+/* Main Card */
+.demo-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  padding: 2rem;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Step 1: Layout */
+.step1-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .step1-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.time-selection {
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.time-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.time-btn {
+  padding: 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  color: #64748b;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.time-btn:hover {
+  background: #e0f2fe;
+  color: #023E8A;
+}
+
+.time-btn.selected {
+  background: #43BFEF;
+  color: white;
+  box-shadow: 0 4px 6px rgba(67, 191, 239, 0.3);
+}
+
+/* Calendar Styles Override */
+.calendar-container {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+.calendar-header {
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  border-radius: 100px;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.calendar-nav button {
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ak-primary-light);
+}
+
+.calendar-nav button:hover {
+  background: var(--ak-gray);
+}
+
+.calendar-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.calendar-cell {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.calendar-cell.head {
+  font-weight: 600;
+  color: #888;
+  cursor: default;
+}
+
+.calendar-cell:not(.head):hover {
+  background: #f1f5f9;
+}
+
+.calendar-cell.selected {
+  background: #43BFEF;
+  color: white;
+}
+
+/* Step 2: Form */
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-input {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #43BFEF;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Step 3: Success */
+.success-container {
+  text-align: center;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.success-icon {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.success-message {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.success-details {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.success-date {
+  font-weight: 700;
+  color: #000;
+  font-size: 1.1rem;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary-AD {
+  background: #43BFEF; /* Color celeste del botón Siguiente/Aceptar */
+  color: white;
+}
+
+.btn-primary-AD:hover {
+  background: #2daae0;
+}
+
+.btn-secondary-AD {
+  background: #43BFEF; /* Color celeste del botón Atrás */
+  color: white;
+  opacity: 0.8;
+}
+
+.btn-secondary-AD:hover {
+  opacity: 1;
+}
+
+.btn-dark {
+  background: #023E8A; /* Color azul oscuro del botón Enviar */
+  color: white;
+}
+
+.btn-dark:hover {
+  background: #022d66;
+}

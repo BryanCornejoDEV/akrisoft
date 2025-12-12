@@ -18,7 +18,7 @@ export default function PlanesHero(){
           <nav className="planes-hero-tabs" aria-label="Secciones de planes">
             <a className="tab active" href="#precios">Precios</a>
             <a className="tab" href="#comparar">Comparar planes</a>
-            <a className="tab" href="#guia">Guía de licencias</a>
+            <a className="tab" href="#guia">Guía de uso</a>
             <a className="tab" href="#introduccion">Introducción</a>
           </nav>
         </div>
