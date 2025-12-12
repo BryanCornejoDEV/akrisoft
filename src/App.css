@@ -256,11 +256,34 @@
   filter: blur(40px); 
   opacity: 0.8;
   animation: float 6s ease-in-out infinite;
+  position: relative;
+  z-index: 0;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
+}
+
+/* Logo sobre el círculo del hero */
+.hero-logo-circular {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 3400px;
+  max-width: 100%;
+  height: auto;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (max-width: 1200px) {
+  .hero-logo-circular { width: 300px; max-width: 58%; }
+}
+
+@media (max-width: 900px) {
+  .hero-logo-circular { width: 220px; max-width: 65%; }
 }
 
 /* CARDS / UTIL */
@@ -319,9 +342,27 @@
   border: 1px solid var(--ak-border);
 }
 .planes-cards { 
-  display: grid; 
-  gap: 24px; 
-  grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); 
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+.planes-cards::-webkit-scrollbar { height: 8px; }
+.planes-cards::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 8px; }
+
+.plan-card { 
+  flex: 0 0 360px;
+  min-width: 280px;
+  background: #fff; 
+  border: 1px solid var(--ak-border); 
+  border-radius: 16px; 
+  padding: 24px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 20px; 
+  transition: all 0.3s ease;
 }
 .plan-card { 
   background: #fff; 
@@ -397,6 +438,13 @@
   color: var(--ak-primary-dark);
   font-size: 0.8rem; 
 }
+.chk-img {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: contain;
+}
 .dash { opacity:.4; }
 .planes-footnote { margin-top:24px; font-size:0.8rem; color: var(--ak-gray); max-width:800px; }
 
@@ -443,6 +491,13 @@
   display: grid;
   place-items: center;
   font-size: 1.25rem;
+}
+
+.feature-icon-img {
+  width: 62%;
+  height: 62%;
+  object-fit: contain;
+  display: block;
 }
 .feature-title { 
   margin: 0 0 8px; 
@@ -517,6 +572,8 @@
 
 /* SOFTWARE SPECS (Home section) */
 .software-specs { padding: 80px 0; display:flex; flex-direction:column; gap:48px; }
+
+.section + .software-specs { padding-top: 0; }
 .specs-top { display:grid; gap:24px; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); }
 .spec-box { 
   background:#fff; 
@@ -613,15 +670,10 @@
 }
 
 /* SOFTWARE VIEW */
-.software-hero { position: relative; padding: 80px 0 40px; overflow:hidden; }
+.software-hero { position: relative; padding: 80px 0 40px; overflow:hidden; background: linear-gradient(135deg, #dee0e285, var(--ak-muted-bg) 40%);}
 .software-hero-wave { 
-  position:absolute; 
-  top:0; 
-  left:0; 
-  width:100%; 
-  height: 400px; 
-  background: url('/Onda1.png') top center / cover no-repeat; 
-  pointer-events:none; 
+  display: none;
+  pointer-events: none;
   z-index: 0;
 }
 .software-hero-inner { position:relative; display:grid; grid-template-columns: 1fr 1fr; gap:64px; align-items:center; z-index: 1; }
@@ -631,16 +683,21 @@
 
 .software-cards-section { position:relative; padding: 60px 0 0; }
 .software-cards-bg {
-  position:absolute; 
-  bottom:0; 
-  left:0; 
-  width:100%; 
-  height: 400px; 
-  background: url('/Onda2.png') bottom center / cover no-repeat; 
-  pointer-events:none; 
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height: auto;
+  min-height: 5200px;
+  background-image: url('/Onda2.png');
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
   z-index: 0;
+  opacity: 0.5;
 }
-.software-cards-grid { position:relative; display:grid; gap:32px; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); z-index: 1; padding-bottom: 100px; }
+.software-cards-grid { position:relative; display:grid; gap:32px; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); z-index: 1; padding-bottom: 30px; }
 .software-card { 
   background:#fff; 
   border:1px solid var(--ak-border); 
@@ -655,8 +712,20 @@
 .software-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--ak-primary); }
 .software-card h3 { margin:0 0 16px; font-size:1.25rem; font-weight:700; color: var(--ak-secondary); }
 .software-card-list { list-style:none; padding:0; margin:0 0 24px; display:flex; flex-direction:column; gap:12px; }
-.software-card-list li { display: flex; gap: 8px; font-size: 0.95rem; color: var(--ak-gray); }
-.software-card-list li::before { content: "✓"; color: var(--ak-primary); font-weight: bold; }
+.software-card-list li { display: flex; gap: 8px; font-size: 0.95rem; color: var(--ak-gray); align-items: center; }
+.software-card-list li::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  background-image: url('/cheque.png');
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  vertical-align: middle;
+  flex: none;
+}
 .software-card-check { 
   margin-top: auto;
   width:40px; 
@@ -668,7 +737,7 @@
   background: var(--ak-primary-light);
   color: var(--ak-primary-dark); 
 }
-.software-cards-cta { text-align:center; margin-top:64px; padding-bottom: 60px; position: relative; z-index: 1; }
+.software-cards-cta { text-align:center; margin-top:8px; padding-bottom: 40px; position: relative; z-index: 1; }
 
 @media (max-width: 1000px){
   .software-hero-inner { grid-template-columns: 1fr; gap: 40px; }
@@ -677,10 +746,10 @@
 
 @media (max-width: 600px) {
   .planes-cards-wrapper { padding: 16px; }
-  .planes-cards { grid-template-columns: 1fr; }
+  .planes-cards { display: grid; grid-template-columns: 1fr; gap: 16px; padding-bottom: 0; overflow: visible; }
   
-  .software-hero-wave { height: 200px; background-size: 100% 100%; }
-  .software-cards-bg { height: 200px; background-size: 100% 100%; }
+  .software-hero-wave { height: 360px; background-size: contain; background-position: center top; }
+  .software-cards-bg { height: auto; min-height: 320px; background-size: contain; background-position: center bottom; }
   
   .section-title { font-size: 1.75rem; }
   .features-title { font-size: 1.75rem; }
@@ -786,4 +855,28 @@
   .software-hero-wave, .software-cards-bg {
     height: 500px;
   }
+}
+
+/* --- Planes Hero estilos --- */
+
+.planes-hero { position: relative; overflow: hidden; background: linear-gradient(225deg, var(--ak-primary), var(--ak-muted-bg) 40%); padding: 64px 0; }
+.planes-hero-inner { display: grid; grid-template-columns: 1fr 460px; gap: 32px; align-items: center; position: relative; z-index: 2; }
+.planes-hero-copy { max-width: 760px; }
+.planes-hero-title { margin: 0 0 16px; font-size: clamp(2rem, 4.5vw, 3rem); color: var(--ak-secondary); }
+.planes-hero-sub { margin: 0 0 20px; color: var(--ak-gray); font-size: 1.05rem; max-width: 62ch; }
+.planes-hero-actions { display:flex; gap:12px; margin-bottom:18px; }
+.planes-hero-tabs { display:flex; gap:18px; margin-top: 8px; }
+.planes-hero-tabs .tab { color: var(--ak-secondary); padding:8px 0; border-bottom: 2px solid transparent; font-weight:600; }
+.planes-hero-tabs .tab.active { color: var(--ak-primary-dark); border-color: var(--ak-primary); }
+
+/* Decorative background artwork */
+
+@media (max-width: 1000px) {
+  .planes-hero-inner { grid-template-columns: 1fr; text-align: left; }
+}
+
+
+@media (max-width: 600px) {
+  .planes-hero { padding: 28px 0; }
+  .planes-hero-tabs { justify-content: center; flex-wrap: wrap; gap: 12px; }
 }

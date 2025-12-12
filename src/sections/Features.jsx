@@ -7,6 +7,15 @@ export default function Features(){
     { title: 'Activo Fijo', desc: 'Altas, bajas, depreciación y reportes.' },
     { title: 'Inventarios', desc: 'Entradas, salidas y kardex en tiempo real.' },
   ]
+  const logoMap = {
+    'Contabilidad': '/Contabilidad.png',
+    'Caja': '/Caja.png',
+    'Compras': '/Compras.png',
+    'Ventas': '/Ventas.png',
+    'Activo Fijo': '/ActivoFijo.png',
+    'Inventarios': '/Inventario.png',
+  }
+
   return (
     <section className="section features">
       <div className="container">
@@ -19,7 +28,11 @@ export default function Features(){
         <div className="grid grid-3 features-grid">
           {features.map((f)=> (
             <article key={f.title} className="card feature-card">
-              <div className="feature-icon" aria-hidden />
+              <div className="feature-icon" aria-hidden="true">
+                {logoMap[f.title] && (
+                  <img src={logoMap[f.title]} alt={f.title} className="feature-icon-img" />
+                )}
+              </div>
               <div>
                 <h3 className="feature-title">{f.title}</h3>
                 <p className="feature-desc">{f.desc}</p>

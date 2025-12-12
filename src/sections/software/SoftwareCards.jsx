@@ -42,7 +42,6 @@ export default function SoftwareCards(){
             <ul className="software-card-list">
               {c.bullets.map(b => <li key={b}>{b}</li>)}
             </ul>
-            <div className="software-card-check" aria-hidden>✓</div>
           </article>
         ))}
       </div>

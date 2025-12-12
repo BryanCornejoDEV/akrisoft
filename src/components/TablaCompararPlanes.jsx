@@ -1,6 +1,8 @@
 import { planes, featureMatrix } from '../data/planesData.js'
 
-const icon = ok => ok ? <span className="chk" aria-label="Incluido">✓</span> : <span className="dash" aria-hidden>—</span>
+const icon = ok => ok
+  ? <img src="/cheque.png" alt="Incluido" className="chk-img" />
+  : <span className="dash" aria-hidden>—</span>
 
 export default function TablaCompararPlanes(){
   return (

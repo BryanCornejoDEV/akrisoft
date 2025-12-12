@@ -16,6 +16,7 @@ export default function Hero(){
         </div>
         <div className="hero-art" aria-hidden="true">
           <div className="hero-circle" />
+          <img src="/LogoCircular.png" alt="Akrisoft" className="hero-logo-circular" />
         </div>
       </div>
     </section>
