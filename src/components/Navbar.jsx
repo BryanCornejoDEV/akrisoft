@@ -90,7 +90,7 @@ export default function Navbar() {
         <NavLink to="/planes" onClick={closeMobileMenu} className={({isActive})=> isActive? 'active': undefined}>Planes</NavLink>
         <NavLink to="/software" onClick={closeMobileMenu} className={({isActive})=> isActive? 'active': undefined}>Software</NavLink>
         <NavLink to="/contacto" onClick={closeMobileMenu} className={({isActive})=> isActive? 'active': undefined}>Contacto</NavLink>
-        <a href="https://app.akrisoft.com/login" target='_blank' className="btn-primary" style={{textAlign: 'center', marginTop: '1rem'}}>Iniciar sesión</a>
+        <a href="https://app.akrisoft.com/login" target='_blank' className="btn-primary" style={{textAlign: 'center', marginTop: '1rem', color: 'var(--ak-primary-light)'}}>Iniciar sesión</a>
       </div>
     </>
   )

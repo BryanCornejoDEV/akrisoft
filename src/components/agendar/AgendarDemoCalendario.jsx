@@ -44,6 +44,20 @@ export default function AgendarDemoCalendario({ selectedDate, onDateChange }) {
   const prevMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))
   const nextMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))
 
+  // minDate: hoy a medianoche
+  const minDate = useMemo(() => {
+    const m = new Date()
+    m.setHours(0, 0, 0, 0)
+    return m
+  }, [])
+
+  const isBeforeMin = (d) => {
+    if (!d) return false
+    const nd = new Date(d)
+    nd.setHours(0, 0, 0, 0)
+    return nd < minDate
+  }
+
   return (
     <div className="calendar-container">
       <div className="calendar-header">
@@ -61,13 +75,30 @@ export default function AgendarDemoCalendario({ selectedDate, onDateChange }) {
           if (!d) return <div key={`empty-${i}`} className="calendar-cell" />
 
           const isSelected = isSameDay(d, selectedDate)
+          const isSunday = d.getDay && d.getDay() === 0
+          const past = isBeforeMin(d)
+
+          if (isSunday || past) {
+            return (
+              <div
+                key={d.toISOString()}
+                className={`calendar-cell disabled`}
+                aria-disabled="true"
+              >
+                {d.getDate()}
+              </div>
+            )
+          }
 
           return (
             <button
               key={d.toISOString()}
               className={`calendar-cell ${isSelected ? 'selected' : ''}`}
               type="button"
-              onClick={() => onDateChange(new Date(d))}
+              onClick={() => {
+                // doble chequeo: no permitir seleccionar días pasados
+                if (!isBeforeMin(d)) onDateChange(new Date(d))
+              }}
             >
               {d.getDate()}
             </button>

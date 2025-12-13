@@ -1,3 +1,4 @@
+import InfoContacto from '../components/InfoContacto.jsx'
 import FormularioContacto from '../components/FormularioContacto.jsx'
 import MapaContacto from '../components/MapaContacto.jsx'
 
@@ -7,12 +8,13 @@ export default function Contacto(){
       <div className="container grid grid-2">
         <div>
           <h1>Contacto</h1>
-          <p>¿Deseas más información? Escríbenos y te contactaremos.</p>
+          <p style={{paddingBottom: 10}}>¿Deseas más información? Escríbenos y te contactaremos.</p>
           <FormularioContacto />
         </div>
         <div>
           <h2>Ubicación</h2>
           <MapaContacto />
+          <InfoContacto />
         </div>
       </div>
     </section>

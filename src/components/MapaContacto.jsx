@@ -1,11 +1,14 @@
-export default function MapaContacto(){
+export default function MapaContacto({ query = 'AUDICCA' }){
+  const src = `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`
   return (
     <div className="mapa">
       <iframe
         title="Ubicación Akrisoft"
-        src="https://www.openstreetmap.org/export/embed.html?bbox=-99.2%2C19.3%2C-99.0%2C19.6&layer=mapnik"
+        src={src}
         style={{border:0, width:'100%', height:'320px'}}
         loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        allowFullScreen
       />
     </div>
   )

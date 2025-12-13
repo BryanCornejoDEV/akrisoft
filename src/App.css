@@ -279,7 +279,7 @@
 }
 
 @media (max-width: 1200px) {
-  .hero-logo-circular { width: 300px; max-width: 58%; }
+  .hero-logo-circular { width: 300px; max-width: 100%; }
 }
 
 @media (max-width: 900px) {
@@ -855,6 +855,11 @@
   .software-hero-wave, .software-cards-bg {
     height: 500px;
   }
+}
+
+.mapa {
+  padding-top: 10px;
+  padding-bottom: 20px;
 }
 
 /* --- Planes Hero estilos --- */

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AgendarDemoCalendario from '../components/agendar/AgendarDemoCalendario.jsx'
 import AgendarDemoFormulario from '../components/agendar/AgendarDemoFormulario.jsx'
 import '../AgendarDemo.css'
@@ -10,7 +10,16 @@ const CorreoIcon = '/Correo.png'
 
 export default function AgendarDemo() {
   const [step, setStep] = useState(1)
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const computeInitialDate = () => {
+    const d = new Date()
+    // If today is Sunday (0), move to Monday
+    if (d.getDay() === 0) {
+      d.setDate(d.getDate() + 1)
+    }
+    return d
+  }
+
+  const [selectedDate, setSelectedDate] = useState(computeInitialDate())
   const [selectedTime, setSelectedTime] = useState(null)
   const [formData, setFormData] = useState({
     nombre: '',
@@ -22,19 +31,41 @@ export default function AgendarDemo() {
     invitados: ''
   })
 
-  const generateTimes = (startHour = 8, endHour = 18, stepMinutes = 30) => {
+  const generateTimesForDate = (date, stepMinutes = 30) => {
+    if (!date) return []
+    const day = new Date(date).getDay() // 0 Domingo, 6 Sábado
+
+    // Domingo: no disponible
+    if (day === 0) return []
+
+    let startHour = 8
+    let endHour = 16 // inclusive end (4pm)
+
+    // Sábado: 8am - 11am
+    if (day === 6) {
+      endHour = 11
+    }
+
     const times = []
     const d = new Date()
     d.setHours(startHour, 0, 0, 0)
-    while (d.getHours() < endHour || (d.getHours() === endHour && d.getMinutes() === 0)) {
-      // Mostrar en formato AM/PM
+    const end = new Date()
+    end.setHours(endHour, 0, 0, 0)
+
+    while (d <= end) {
       times.push(d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }))
       d.setTime(d.getTime() + stepMinutes * 60000)
     }
+
     return times
   }
 
-  const availableTimes = generateTimes(8, 18, 30)
+  const [availableTimes, setAvailableTimes] = useState(() => generateTimesForDate(selectedDate))
+
+  useEffect(() => {
+    setSelectedTime(null)
+    setAvailableTimes(generateTimesForDate(selectedDate))
+  }, [selectedDate])
 
   const formatDate = (date) => {
     if (!date) return ''
@@ -98,15 +129,19 @@ export default function AgendarDemo() {
               </p>
               
               <div className="time-list">
-                {availableTimes.map(time => (
-                  <button 
-                    key={time} 
-                    className={`time-btn ${selectedTime === time ? 'selected' : ''}`}
-                    onClick={() => setSelectedTime(time)}
-                  >
-                    {time}
-                  </button>
-                ))}
+                {availableTimes.length === 0 ? (
+                  <p style={{color: '#666'}}>No hay horarios disponibles para este día.</p>
+                ) : (
+                  availableTimes.map(time => (
+                    <button 
+                      key={time} 
+                      className={`time-btn ${selectedTime === time ? 'selected' : ''}`}
+                      onClick={() => setSelectedTime(time)}
+                    >
+                      {time}
+                    </button>
+                  ))
+                )}
               </div>
             </div>
             
