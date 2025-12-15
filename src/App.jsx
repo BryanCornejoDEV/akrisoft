@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion'
 import './App.css'
 
 import Navbar from './components/Navbar.jsx'
-import PageTransition from './components/PageTransition.jsx'
+import Layout from './components/Layout.jsx'
 
 import Index from './pages/Index.jsx'
 import Planes from './pages/Planes.jsx'
@@ -20,14 +20,14 @@ function App() {
       <Navbar />
 
       <main>
-        <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
+        <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-            <Route path="/planes" element={<PageTransition><Planes /></PageTransition>} />
-            <Route path="/software" element={<PageTransition><Software /></PageTransition>} />
-            <Route path="/contacto" element={<PageTransition><Contacto /></PageTransition>} />
-            <Route path="/formulario" element={<PageTransition><Formulario /></PageTransition>} />
-            <Route path="/agendar-demo" element={<PageTransition><AgendarDemo /></PageTransition>} />
+            <Route path="/" element={<Layout><Index /></Layout>} />
+            <Route path="/planes" element={<Layout><Planes /></Layout>} />
+            <Route path="/software" element={<Layout><Software /></Layout>} />
+            <Route path="/contacto" element={<Layout><Contacto /></Layout>} />
+            <Route path="/formulario" element={<Layout><Formulario /></Layout>} />
+            <Route path="/agendar-demo" element={<Layout><AgendarDemo /></Layout>} />
           </Routes>
         </AnimatePresence>
       </main>

@@ -1,8 +1,11 @@
 import { planes } from '../data/planesData.js'
+import { useNavigate } from 'react-router-dom'
 
 const formatCurrency = v => `$${v.toFixed(2)}`
 
 export default function PlanesCards(){
+  const navigate = useNavigate()
+
   return (
     <div className="planes-cards-wrapper">
       <div className="planes-cards">
@@ -20,7 +23,7 @@ export default function PlanesCards(){
               {p.incluye.map(i => <li key={i}>{i}</li>)}
             </ul>
             <div className="plan-actions">
-              <a className="btn-primary" href="/agendar-demo">Obtener plan</a>
+              <button className="btn-primary" onClick={() => navigate("/agendar-demo")}>Obtener plan</button>
             </div>
           </article>
         ))}

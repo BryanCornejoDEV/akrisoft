@@ -1,4 +1,9 @@
+import { useNavigate } from 'react-router-dom'
+
 export default function SoftwareSpecs(){
+  const navigate = useNavigate()
+  
+
   return (
     <section className="software-specs">
       <div className="container specs-top">
@@ -18,11 +23,12 @@ export default function SoftwareSpecs(){
         </div>
       </div>
       <div className="container specs-flex">
+        <h3 className="specs-title">Explora soluciones flexibles con Akrisoft</h3>
+
         <div className="specs-logo" aria-hidden>
           <img src="/LogoCircular.png" alt="Akrisoft" />
         </div>
         <div className="specs-info">
-          <h3 className="specs-title">Explora soluciones flexibles con Akrisoft</h3>
           
           <div className="specs-grid-list">
             <div className="specs-item">
@@ -50,7 +56,7 @@ export default function SoftwareSpecs(){
             </div>
           </div>
 
-          <button className="btn-primary specs-btn" onClick={()=>window.location.href='/software'}>Más información</button>
+          <button className="btn-primary specs-btn" onClick={() => navigate("/software")}>Más información</button>
         </div>
       </div>
     </section>

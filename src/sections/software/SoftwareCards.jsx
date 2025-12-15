@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+
 const cards = [
   {
     title: 'Facturación Electrónica Automatizada',
@@ -32,6 +34,8 @@ const cards = [
 ]
 
 export default function SoftwareCards(){
+  const navigate = useNavigate()
+
   return (
     <div className="software-cards-section">
       <div className="software-cards-bg" aria-hidden />
@@ -46,7 +50,7 @@ export default function SoftwareCards(){
         ))}
       </div>
       <div className="software-cards-cta">
-        <a href="/planes" className="btn-primary">Ver planes</a>
+        <button className="btn-primary" onClick={() => navigate("/planes")}>Ver planes</button>
       </div>
     </div>
   )
