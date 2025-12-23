@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import AgendarDemoCalendario from '../components/agendar/AgendarDemoCalendario.jsx'
 import AgendarDemoFormulario from '../components/agendar/AgendarDemoFormulario.jsx'
 import '../AgendarDemo.css'
@@ -10,6 +10,11 @@ const CorreoIcon = '/Correo.png'
 
 export default function AgendarDemo() {
   const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [meetLink, setMeetLink] = useState('')
+  const [calendarEventLink, setCalendarEventLink] = useState('')
+
   const computeInitialDate = () => {
     const d = new Date()
     // If today is Sunday (0), move to Monday
@@ -28,7 +33,7 @@ export default function AgendarDemo() {
     telefono: '',
     empresa: '',
     cargo: '',
-    invitados: ''
+    invitados: []
   })
 
   const generateTimesForDate = (date, stepMinutes = 30) => {
@@ -62,10 +67,11 @@ export default function AgendarDemo() {
 
   const [availableTimes, setAvailableTimes] = useState(() => generateTimesForDate(selectedDate))
 
-  useEffect(() => {
+  const handleDateChange = (nextDate) => {
+    setSelectedDate(nextDate)
     setSelectedTime(null)
-    setAvailableTimes(generateTimesForDate(selectedDate))
-  }, [selectedDate])
+    setAvailableTimes(generateTimesForDate(nextDate))
+  }
 
   const formatDate = (date) => {
     if (!date) return ''
@@ -73,6 +79,129 @@ export default function AgendarDemo() {
     const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
     const dateString = date.toLocaleDateString('es-MX', options)
     return dateString.charAt(0).toUpperCase() + dateString.slice(1)
+  }
+
+  const parseTimeLabelTo24h = (label) => {
+    if (!label) return null
+    // Ej: "08:30 AM" (en-US)
+    const match = String(label).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i)
+    if (!match) return null
+    let hours = Number(match[1])
+    const minutes = Number(match[2])
+    const meridiem = match[3].toUpperCase()
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null
+    if (meridiem === 'PM' && hours !== 12) hours += 12
+    if (meridiem === 'AM' && hours === 12) hours = 0
+    return { hours, minutes }
+  }
+
+  const buildStartEnd = () => {
+    if (!selectedDate || !selectedTime) return null
+    const parsed = parseTimeLabelTo24h(selectedTime)
+    if (!parsed) return null
+    const start = new Date(selectedDate)
+    start.setHours(parsed.hours, parsed.minutes, 0, 0)
+    const end = new Date(start)
+    end.setMinutes(end.getMinutes() + 30)
+    return { start, end }
+  }
+
+  const parseInvitados = (raw) => {
+    if (!raw) return []
+    if (Array.isArray(raw)) return raw.filter(Boolean).map(s=>String(s).trim()).filter(s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s))
+    return String(raw)
+      .split(/[;,\n\t\s]+/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .filter(s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s))
+  }
+
+  const submitSchedule = async () => {
+    setSubmitError('')
+    setMeetLink('')
+    setCalendarEventLink('')
+
+    const apiBaseUrl = import.meta.env.APP_URL
+    const apiKey = import.meta.env.LANDING_API_KEY
+    const toEmail = import.meta.env.LANDING_TO_EMAIL
+    const schedulePath = import.meta.env.LANDING_SCHEDULE_DEMO_PATH || '/api/landing/schedule-demo'
+
+    if (!apiBaseUrl) throw new Error('Falta configurar APP_URL (por ejemplo http://localhost:8000).')
+    if (!apiKey) throw new Error('Falta configurar LANDING_API_KEY.')
+    if (!toEmail) throw new Error('Falta configurar LANDING_TO_EMAIL.')
+
+    const range = buildStartEnd()
+    if (!range) throw new Error('Fecha u hora inválida.')
+
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const invitados = parseInvitados(formData.invitados)
+    const fullName = `${formData.nombre} ${formData.apellidos}`.trim()
+    const formatted = `${formatDate(selectedDate)} ${selectedTime}`
+    const subject = `Agendar Demo - ${formData.empresa || 'Sin empresa'} - ${formatted}`
+    const message = [
+      'Solicitud de Demo (Landing)',
+      '',
+      `Fecha/Hora: ${formatted}`,
+      `Zona horaria: ${timeZone}`,
+      '',
+      `Nombre: ${fullName}`,
+      `Correo: ${formData.correo}`,
+      `Teléfono: ${formData.telefono}`,
+      `Empresa: ${formData.empresa || '-'}`,
+      `Cargo: ${formData.cargo || '-'}`,
+      `Invitados: ${invitados.length ? invitados.join(', ') : '-'}`,
+    ].join('\n')
+
+    const payload = {
+      subject,
+      name: fullName,
+      email: formData.correo,
+      company: formData.empresa,
+      phone: formData.telefono,
+      position: formData.cargo,
+      message,
+      to_email: toEmail,
+
+      // Envío ambas variantes por compatibilidad con distintos backends
+      start_at: range.start.toISOString(),
+      end_at: range.end.toISOString(),
+      starts_at: range.start.toISOString(),
+      ends_at: range.end.toISOString(),
+      // Compatibilidad: algunos backends esperan 'timezone' y 'guests'
+      time_zone: timeZone,
+      timezone: timeZone,
+
+      // 'guests' será solo los invitados añadidos (sin el organizador)
+      guests: invitados,
+
+      attendees: [formData.correo, ...invitados].filter(Boolean),
+    }
+
+    const endpoint = new URL(schedulePath, apiBaseUrl).toString()
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'X-API-KEY': apiKey,
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(text || `Error HTTP ${res.status}`)
+    }
+
+    const contentType = res.headers.get('content-type') || ''
+    if (contentType.includes('application/json')) {
+      const data = await res.json().catch(() => null)
+      const meet = data?.meetLink || data?.meet_link || data?.hangoutLink || data?.conferenceLink
+      const cal = data?.calendarEventLink || data?.calendar_event_link || data?.eventLink || data?.htmlLink
+      if (meet) setMeetLink(meet)
+      if (cal) setCalendarEventLink(cal)
+    }
   }
 
   const handleNext = () => {
@@ -83,12 +212,19 @@ export default function AgendarDemo() {
         alert('Por favor selecciona una fecha y una hora.')
       }
     } else if (step === 2) {
-      // Validar formulario si es necesario
-      if (formData.nombre && formData.correo && formData.apellidos && formData.telefono) {
-        setStep(3)
-      } else {
+      // Validar formulario
+      if (!(formData.nombre && formData.correo && formData.apellidos && formData.telefono)) {
         alert('Por favor completa los campos obligatorios (*)')
+        return
       }
+
+      setIsSubmitting(true)
+      submitSchedule()
+        .then(() => setStep(3))
+        .catch((err) => {
+          setSubmitError(`No se pudo agendar la demo. ${err instanceof Error ? err.message : ''}`.trim())
+        })
+        .finally(() => setIsSubmitting(false))
     }
   }
 
@@ -148,7 +284,7 @@ export default function AgendarDemo() {
             <div>
               <AgendarDemoCalendario 
                 selectedDate={selectedDate} 
-                onDateChange={setSelectedDate} 
+                onDateChange={handleDateChange} 
               />
             </div>
           </div>
@@ -163,6 +299,9 @@ export default function AgendarDemo() {
               </p>
             </div>
             <AgendarDemoFormulario formData={formData} onChange={setFormData} />
+            {submitError ? (
+              <p style={{ marginTop: '1rem', marginBottom: 0, textAlign: 'center' }} role="alert">{submitError}</p>
+            ) : null}
           </div>
         )}
 
@@ -175,6 +314,16 @@ export default function AgendarDemo() {
               <p className="success-date">
                 {formatDate(selectedDate)} {selectedTime}
               </p>
+              {meetLink ? (
+                <p style={{ marginTop: '0.75rem' }}>
+                  Enlace de Google Meet: <a href={meetLink} target="_blank" rel="noreferrer">{meetLink}</a>
+                </p>
+              ) : null}
+              {calendarEventLink ? (
+                <p style={{ marginTop: '0.25rem' }}>
+                  Evento en Google Calendar: <a href={calendarEventLink} target="_blank" rel="noreferrer">Abrir</a>
+                </p>
+              ) : null}
             </div>
             <button className="btn btn-primary-AD" onClick={() => window.location.reload()}>
               Aceptar
@@ -198,8 +347,9 @@ export default function AgendarDemo() {
           <button 
             className={`btn ${step === 2 ? 'btn-dark' : 'btn-primary-AD'}`} 
             onClick={handleNext}
+            disabled={isSubmitting}
           >
-            {step === 1 ? 'Siguiente' : 'Enviar'}
+            {step === 1 ? 'Siguiente' : (isSubmitting ? 'Enviando…' : 'Enviar')}
           </button>
         </div>
       )}

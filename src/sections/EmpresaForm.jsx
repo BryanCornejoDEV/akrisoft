@@ -5,6 +5,8 @@ import Page2 from '../components/formularioEmpresa/Page2';
 export default function EmpresaForm({ isOpen, onOpen, onClose }) {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Scroll to top when step changes or when form opens
   useEffect(() => {
@@ -21,6 +23,9 @@ export default function EmpresaForm({ isOpen, onOpen, onClose }) {
   }, [step, isOpen]);
 
   const [formData, setFormData] = useState({
+    nombreEmpresa: '',
+    email: '',
+    nombreCompleto: '',
     industria: '',
     industriaOtro: '',
     tamanoEmpresa: '',
@@ -40,6 +45,11 @@ export default function EmpresaForm({ isOpen, onOpen, onClose }) {
 
   const validateStep1 = () => {
     const newErrors = {};
+    if (!formData.nombreEmpresa) newErrors.nombreEmpresa = 'Indique el nombre de la empresa';
+    if (!formData.nombreCompleto) newErrors.nombreCompleto = 'Indique su nombre completo';
+    if (!formData.email) newErrors.email = 'Indique un email';
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Indique un email válido';
+
     if (!formData.industria) newErrors.industria = 'Seleccione una industria';
     if (formData.industria === 'Otro' && !formData.industriaOtro) newErrors.industriaOtro = 'Especifique la industria';
     
@@ -107,30 +117,125 @@ export default function EmpresaForm({ isOpen, onOpen, onClose }) {
     setStep(prev => prev - 1);
   };
 
-  const handleSubmit = (e) => {
+  const resetForm = () => {
+    setStep(1);
+    setErrors({});
+    setSubmitError('');
+    setFormData({
+      nombreEmpresa: '',
+      email: '',
+      nombreCompleto: '',
+      industria: '',
+      industriaOtro: '',
+      tamanoEmpresa: '',
+      personasDependen: '',
+      objetivoPrincipal: '',
+      objetivoOtro: '',
+      sistemaActual: '',
+      sistemaActualCual: '',
+      modulosImprescindibles: [],
+      transaccionesMensuales: '',
+      tiempoTareasManuales: '',
+      crecimientoExpansion: '',
+      crecimientoPrevision: '',
+      formacionUsuarios: '',
+      formacionEstimacion: ''
+    });
+  };
+
+  const buildEmpresaSummary = () => {
+    const industria = formData.industria === 'Otro' ? `${formData.industria} - ${formData.industriaOtro}` : formData.industria;
+    const objetivo = formData.objetivoPrincipal === 'Otro' ? `${formData.objetivoPrincipal} - ${formData.objetivoOtro}` : formData.objetivoPrincipal;
+    const sistema = formData.sistemaActual === 'Si' ? `Sí (${formData.sistemaActualCual})` : formData.sistemaActual;
+    const modulos = (formData.modulosImprescindibles || []).join(', ');
+
+    return [
+      'Formulario Empresa',
+      '',
+      `Empresa: ${formData.nombreEmpresa}`,
+      `Nombre completo: ${formData.nombreCompleto}`,
+      `Email: ${formData.email}`,
+      '',
+      `Industria: ${industria}`,
+      `Tamaño empresa (empleados): ${formData.tamanoEmpresa}`,
+      `Personas que dependen del sistema: ${formData.personasDependen}`,
+      `Objetivo principal: ${objetivo}`,
+      `Sistema actual: ${sistema}`,
+      '',
+      `Módulos imprescindibles: ${modulos}`,
+      `Transacciones mensuales: ${formData.transaccionesMensuales}`,
+      `Tiempo en tareas manuales: ${formData.tiempoTareasManuales}`,
+      `Crecimiento/expansión: ${formData.crecimientoExpansion}`,
+      `Previsión crecimiento: ${formData.crecimientoPrevision || '-'}`,
+      `Formación usuarios: ${formData.formacionUsuarios}`,
+      `Estimación formación: ${formData.formacionEstimacion || '-'}`,
+    ].join('\n');
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep2()) {
-        console.log('Form Data Submitted:', formData);
-        alert('Formulario enviado con éxito (Demo)');
-        onClose(); 
-        setStep(1);
-        setFormData({
-            industria: '',
-            industriaOtro: '',
-            tamanoEmpresa: '',
-            personasDependen: '',
-            objetivoPrincipal: '',
-            objetivoOtro: '',
-            sistemaActual: '',
-            sistemaActualCual: '',
-            modulosImprescindibles: [], 
-            transaccionesMensuales: '',
-            tiempoTareasManuales: '',
-            crecimientoExpansion: '',
-            crecimientoPrevision: '',
-            formacionUsuarios: '',
-            formacionEstimacion: ''
-        });
+    setSubmitError('');
+
+    if (!validateStep2()) return;
+
+    const apiBaseUrl = import.meta.env.APP_URL;
+    const apiKey = import.meta.env.LANDING_API_KEY;
+    const toEmail = import.meta.env.LANDING_TO_EMAIL;
+
+    if (!apiBaseUrl) {
+      setSubmitError('Falta configurar APP_URL (por ejemplo http://localhost:8000).');
+      return;
+    }
+    if (!apiKey) {
+      setSubmitError('Falta configurar LANDING_API_KEY.');
+      return;
+    }
+    if (!toEmail) {
+      setSubmitError('Falta configurar LANDING_TO_EMAIL.');
+      return;
+    }
+
+    const endpoint = new URL('/api/landing/contact', apiBaseUrl).toString();
+    const industriaSubject = formData.industria === 'Otro' ? formData.industriaOtro : formData.industria;
+    const empresaSubject = formData.nombreEmpresa || 'Empresa';
+
+    const payload = {
+      subject: `Formulario Empresa - ${empresaSubject} - ${industriaSubject || 'Sin industria'}`,
+      name: formData.nombreCompleto,
+      email: formData.email,
+      company: formData.nombreEmpresa,
+      message: buildEmpresaSummary(),
+      to_email: toEmail,
+
+      // Datos extra por si el backend los quiere guardar
+      empresa_form: formData,
+    };
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'X-API-KEY': apiKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(text || `Error HTTP ${res.status}`);
+      }
+
+      alert('Formulario enviado con éxito');
+      onClose();
+      resetForm();
+    } catch (err) {
+      setSubmitError(`No se pudo enviar el formulario. ${err instanceof Error ? err.message : ''}`.trim());
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -153,6 +258,10 @@ export default function EmpresaForm({ isOpen, onOpen, onClose }) {
     <div className="empresa-form-section fade-in">
       <div className="empresa-form-container">
         <h2 className="form-title">¡Cuéntanos sobre tu empresa!</h2>
+
+        {submitError ? (
+          <p style={{ marginTop: 10, marginBottom: 0 }} role="alert">{submitError}</p>
+        ) : null}
         
         <form onSubmit={handleSubmit}>
           {step === 1 && (
@@ -169,8 +278,8 @@ export default function EmpresaForm({ isOpen, onOpen, onClose }) {
               formData={formData} 
               handleChange={handleChange} 
               prevStep={prevStep} 
-              handleSubmit={handleSubmit}
               errors={errors}
+              isSubmitting={isSubmitting}
             />
           )}
         </form>

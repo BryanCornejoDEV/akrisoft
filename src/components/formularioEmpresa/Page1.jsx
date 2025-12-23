@@ -3,6 +3,46 @@ import React from 'react';
 export default function Page1({ formData, handleChange, nextStep, errors }) {
   return (
     <div className="form-page fade-in">
+      {/* Identificación */}
+      <div className="form-group">
+        <label className="form-label">Nombre de la empresa</label>
+        <input
+          type="text"
+          name="nombreEmpresa"
+          className="form-input-text"
+          value={formData.nombreEmpresa}
+          onChange={handleChange}
+          placeholder="Nombre de la empresa"
+        />
+        {errors.nombreEmpresa && <span className="error-text">{errors.nombreEmpresa}</span>}
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Nombre completo</label>
+        <input
+          type="text"
+          name="nombreCompleto"
+          className="form-input-text"
+          value={formData.nombreCompleto}
+          onChange={handleChange}
+          placeholder="Nombre y apellido"
+        />
+        {errors.nombreCompleto && <span className="error-text">{errors.nombreCompleto}</span>}
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">Email</label>
+        <input
+          type="email"
+          name="email"
+          className="form-input-text"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="correo@empresa.com"
+        />
+        {errors.email && <span className="error-text">{errors.email}</span>}
+      </div>
+
       {/* 1. Industria */}
       <div className="form-group">
         <label className="form-label">¿En qué industria opera la compañía?</label>

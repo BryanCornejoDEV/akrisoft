@@ -1,16 +1,9 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 
 export default function AgendarDemoCalendario({ selectedDate, onDateChange }) {
   const today = useMemo(() => new Date(), [])
   const initial = selectedDate ? new Date(selectedDate) : today
   const [currentMonth, setCurrentMonth] = useState(new Date(initial.getFullYear(), initial.getMonth(), 1))
-
-  useEffect(() => {
-    if (selectedDate) {
-      const sd = new Date(selectedDate)
-      setCurrentMonth(new Date(sd.getFullYear(), sd.getMonth(), 1))
-    }
-  }, [selectedDate])
 
   const monthName = currentMonth.toLocaleString('es-MX', { month: 'long', year: 'numeric' })
   const formattedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1)

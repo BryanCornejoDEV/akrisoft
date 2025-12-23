@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Page2({ formData, handleChange, prevStep, handleSubmit, errors }) {
+export default function Page2({ formData, handleChange, prevStep, errors, isSubmitting }) {
   return (
     <div className="form-page fade-in">
       {/* 1. Módulos Imprescindibles */}
@@ -125,7 +125,9 @@ export default function Page2({ formData, handleChange, prevStep, handleSubmit, 
 
       <div className="form-navigation">
         <button type="button" className="btn-secondary" onClick={prevStep}>Atrás</button>
-        <button type="submit" className="btn-primary">Enviar</button>
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
+          {isSubmitting ? 'Enviando…' : 'Enviar'}
+        </button>
       </div>
     </div>
   );
